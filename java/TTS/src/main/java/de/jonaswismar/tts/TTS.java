@@ -19,10 +19,91 @@ public class TTS {
 
     public static void main(String[] args) {
         File ttsSourceFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\data\\Strassen und Orte");
-        File ttsTempFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\data_tmp");
+        File ttsTempFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\tmp");
         File ttsTargetFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\data_sd");
+        Collection<File> filesTmp;
+        File[] filesTmpArray;
+        /*
+        * Clean previous run
+        */
+        try {
+            System.out.println("Lösche Verzeichnis \"" + ttsTempFolder + "\"");
+            FileUtils.deleteDirectory(ttsTempFolder);
+            System.out.println("Lösche Verzeichnis \"" + ttsTargetFolder + "\"");
+            FileUtils.deleteDirectory(ttsTargetFolder);
+        } catch (IOException ex) {
+            Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        /*
+        * Load all mp3
+        */
         System.out.println("Lade alle *.mp3 aus Verzeichnis \"" + ttsSourceFolder + "\"");
         Collection<File> files = FileUtils.listFiles(ttsSourceFolder, new String[]{"mp3"}, true);
+        
+        /*
+        * PLZ
+        */
+        for (File file : files) {
+            String filePath = file.getAbsolutePath();
+            String fileName = file.getName();
+            if (StringUtils.contains(filePath, "PLZ")) {
+                try {
+                    File targetFile = new File(ttsTempFolder + "\\" + cleanSDPlayerFileName(fileName));
+                    FileUtils.copyFile(file, targetFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
+        filesTmpArray = new File[filesTmp.size()];
+        filesTmpArray = filesTmp.toArray(filesTmpArray);
+        for (int i = 0; i < filesTmpArray.length; i++) {
+            File file = filesTmpArray[i];
+            String fileName = file.getName();
+            File targetFile = new File(ttsTargetFolder + "\\02\\" + StringUtils.leftPad(String.valueOf(i + 1), 3, "0") + "_" + fileName);
+            try {
+                FileUtils.moveFile(file, targetFile);
+            } catch (IOException ex) {
+                Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        ttsTempFolder.delete();
+        
+        /*
+        * Namen
+        */
+        for (File file : files) {
+            String filePath = file.getAbsolutePath();
+            String fileName = file.getName();
+            if (StringUtils.contains(filePath, "NAMEN")) {
+                try {
+                    File targetFile = new File(ttsTempFolder + "\\" + cleanSDPlayerFileName(fileName));
+                    FileUtils.copyFile(file, targetFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
+        filesTmpArray = new File[filesTmp.size()];
+        filesTmpArray = filesTmp.toArray(filesTmpArray);
+        for (int i = 0; i < filesTmpArray.length; i++) {
+            File file = filesTmpArray[i];
+            String fileName = file.getName();
+            File targetFile = new File(ttsTargetFolder + "\\01\\" + StringUtils.leftPad(String.valueOf(i + 1), 3, "0") + "_" + fileName);
+            try {
+                FileUtils.moveFile(file, targetFile);
+            } catch (IOException ex) {
+                Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        ttsTempFolder.delete();
+        
+        /*
+        * Straßen
+        */
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
@@ -35,8 +116,8 @@ public class TTS {
                 }
             }
         }
-        Collection<File> filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
-        File[] filesTmpArray = new File[filesTmp.size()];
+        filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
+        filesTmpArray = new File[filesTmp.size()];
         filesTmpArray = filesTmp.toArray(filesTmpArray);
         for (int i = 0; i < filesTmpArray.length; i++) {
             File file = filesTmpArray[i];
@@ -48,6 +129,7 @@ public class TTS {
                 Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        ttsTempFolder.delete();
     }
 
     public static String cleanSDPlayerFileName(String oldName) {
