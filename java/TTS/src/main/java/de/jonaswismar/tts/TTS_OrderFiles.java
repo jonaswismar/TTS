@@ -9,41 +9,43 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author jonas
  */
-public class TTS {
+public class TTS_OrderFiles {
 
     public static void main(String[] args) {
         File ttsSourceFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\data\\Strassen und Orte");
         File ttsTempFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\tmp");
         File ttsTargetFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\data_sd");
+        File ttsOtherFolder = new File("C:\\Users\\jonas\\Documents\\PlatformIO\\Projects\\TTS\\src_other");
         Collection<File> filesTmp;
         File[] filesTmpArray;
         /*
         * Clean previous run
-        */
+         */
         try {
             System.out.println("Lösche Verzeichnis \"" + ttsTempFolder + "\"");
             FileUtils.deleteDirectory(ttsTempFolder);
             System.out.println("Lösche Verzeichnis \"" + ttsTargetFolder + "\"");
             FileUtils.deleteDirectory(ttsTargetFolder);
         } catch (IOException ex) {
-            Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         /*
         * Load all mp3
-        */
+         */
         System.out.println("Lade alle *.mp3 aus Verzeichnis \"" + ttsSourceFolder + "\"");
         Collection<File> files = FileUtils.listFiles(ttsSourceFolder, new String[]{"mp3"}, true);
-        
+
         /*
         * PLZ
-        */
+         */
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
@@ -52,28 +54,34 @@ public class TTS {
                     File targetFile = new File(ttsTempFolder + "\\" + cleanSDPlayerFileName(fileName));
                     FileUtils.copyFile(file, targetFile);
                 } catch (IOException ex) {
-                    Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
         filesTmpArray = new File[filesTmp.size()];
         filesTmpArray = filesTmp.toArray(filesTmpArray);
-        for (int i = 0; i < filesTmpArray.length; i++) {
+
+     
+         for (int i = 0; i < filesTmpArray.length; i++) {
             File file = filesTmpArray[i];
             String fileName = file.getName();
-            File targetFile = new File(ttsTargetFolder + "\\02\\" + StringUtils.leftPad(String.valueOf(i + 1), 3, "0") + "_" + fileName);
+            int newNumber = i + 1;
+            String newFilename = StringUtils.leftPad(String.valueOf(newNumber), 3, "0") + "_" + fileName;
+
+          
+            File targetFile = new File(ttsTargetFolder + "\\02\\" + newFilename);
             try {
                 FileUtils.moveFile(file, targetFile);
             } catch (IOException ex) {
-                Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        ttsTempFolder.delete();
-        
+          ttsTempFolder.delete();
+
         /*
         * Namen
-        */
+         */
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
@@ -82,28 +90,32 @@ public class TTS {
                     File targetFile = new File(ttsTempFolder + "\\" + cleanSDPlayerFileName(fileName));
                     FileUtils.copyFile(file, targetFile);
                 } catch (IOException ex) {
-                    Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         filesTmp = FileUtils.listFiles(ttsTempFolder, new String[]{"mp3"}, true);
         filesTmpArray = new File[filesTmp.size()];
         filesTmpArray = filesTmp.toArray(filesTmpArray);
-        for (int i = 0; i < filesTmpArray.length; i++) {
+           for (int i = 0; i < filesTmpArray.length; i++) {
             File file = filesTmpArray[i];
             String fileName = file.getName();
-            File targetFile = new File(ttsTargetFolder + "\\01\\" + StringUtils.leftPad(String.valueOf(i + 1), 3, "0") + "_" + fileName);
-            try {
+            int newNumber = i + 1;
+            String newFilename = StringUtils.leftPad(String.valueOf(newNumber), 3, "0") + "_" + fileName;
+
+            File targetFile = new File(ttsTargetFolder + "\\01\\" + newFilename);
+
+             try {
                 FileUtils.moveFile(file, targetFile);
             } catch (IOException ex) {
-                Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        ttsTempFolder.delete();
-        
+         ttsTempFolder.delete();
+
         /*
         * Straßen
-        */
+         */
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
@@ -112,7 +124,7 @@ public class TTS {
                     File targetFile = new File(ttsTempFolder + "\\" + cleanSDPlayerFileName(fileName));
                     FileUtils.copyFile(file, targetFile);
                 } catch (IOException ex) {
-                    Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -126,7 +138,7 @@ public class TTS {
             try {
                 FileUtils.moveFile(file, targetFile);
             } catch (IOException ex) {
-                Logger.getLogger(TTS.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         ttsTempFolder.delete();
@@ -150,5 +162,13 @@ public class TTS {
                 .replace("Ä", "AE");
 
         return newName;
+    }
+
+    public static void writeCode(String fileName, String content, boolean append) {
+        try {
+            FileUtils.write(new File(fileName), content, "UTF8", append);
+        } catch (IOException ex) {
+            Logger.getLogger(TTS_OrderFiles.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
