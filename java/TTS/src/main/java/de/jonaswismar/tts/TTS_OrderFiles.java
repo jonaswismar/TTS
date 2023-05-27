@@ -142,6 +142,8 @@ System.out.println(counterStrassen + " Straße/n");
 
     public static String cleanSDPlayerFileName(String oldName) {
         String newName = oldName.replace(" ", "_")
+                .replace("(", "")
+                .replace(")", "")
                 .replace("ü", "ue")
                 .replace("ö", "oe")
                 .replace("ä", "ae")
